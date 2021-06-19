@@ -8,6 +8,7 @@ import torch
 
 class Speech_Recognizer:
     def __init__(self, model_name):
+        # model_name from https://huggingface.co/models?pipeline_tag=automatic-speech-recognition
         self.model_name = model_name
         self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(self.model_name)
         self.model = Wav2Vec2ForMaskedLM.from_pretrained(self.model_name)
@@ -23,6 +24,7 @@ class Speech_Recognizer:
 
 class Text_Feature_Extracter:
     def __init__(self, model_name):
+        # model_name from https://huggingface.co/models (bert-base-uncased preferrably)
         self.model_name = model_name
         self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
         self.model = TFBertModel.from_pretrained(self.model)
@@ -44,3 +46,12 @@ class Text_Feature_Extracter:
         data = data[1:]
         return data
 
+class Speech_To_Text_Features:
+    def __init__(self, mname_asr, mname_txt):
+        self.SR = Speech_Recognizer(mname_asr)
+        self.TFE = Text_Feature_Extracter(mname_txt)
+
+    def get_text_features(self, ):
+        transcription = SR.transcribe(audio_file_name)
+        txt_features = TFE.features_fromtext(transcription)
+        return txt_features
