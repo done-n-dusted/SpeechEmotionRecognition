@@ -28,7 +28,7 @@ class Text_Feature_Extracter:
         self.model = TFBertModel.from_pretrained(self.model)
 
     def features_fromtext(self, text_array, window = 50):
-        data = np.arrat([[0]*768])
+        data = np.array([[0]*768])
 
         for i in tqdm(range(0, len(text_array), window)):
             encoded = self.tokenizer(text_array[i:i+window], padding = 'max_length', return_tensors = 'tf')
