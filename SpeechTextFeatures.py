@@ -27,12 +27,17 @@ class Text_Feature_Extracter:
         self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
         self.model = TFBertModel.from_pretrained(self.model)
 
-    def features_fromtext(self, text_array, window = 50):
+    def features_fromtext(self, text):
+        encoded = self.tokenizer(text, padding = 'max_length', return_tensors = 'tf')
+        output = self.model(encoded['input_ids'], attention_mask = encoded['attention_mask'])
+        return np.array(output.pooler_output)
+
+    def features_fromtext_batch(self, text_array, window = 50):
         data = np.array([[0]*768])
 
         for i in tqdm(range(0, len(text_array), window)):
             encoded = self.tokenizer(text_array[i:i+window], padding = 'max_length', return_tensors = 'tf')
-            output = model(encoded['input_ids'], attention_mask = encoded['attention_mask'])
+            output = self.model(encoded['input_ids'], attention_mask = encoded['attention_mask'])
             temp = output.pooler_output
             data = np.concatenate([data, temp])
         
