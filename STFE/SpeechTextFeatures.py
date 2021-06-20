@@ -6,6 +6,7 @@ from tqdm import tqdm
 import librosa
 import torch
 
+
 class Speech_Recognizer:
     def __init__(self, model_name):
         # model_name from https://huggingface.co/models?pipeline_tag=automatic-speech-recognition
@@ -20,7 +21,7 @@ class Speech_Recognizer:
         logits = model(input_values).logits
         predicted_ids = torch.argmax(logits, dim = -1)
         transcription = tokenizer.batch_decode(predicted_ids)[0]
-    
+
 
 class Text_Feature_Extracter:
     def __init__(self, model_name):
@@ -32,7 +33,7 @@ class Text_Feature_Extracter:
     def features_fromtext(self, text):
         encoded = self.tokenizer(text, padding = 'max_length', return_tensors = 'tf')
         output = self.model(encoded['input_ids'], attention_mask = encoded['attention_mask'])
-        return np.array(output.pooler_output)
+        return np.array(output.pooler_output)[0]
 
     def features_fromtext_batch(self, text_array, window = 50):
         data = np.array([[0]*768])
@@ -45,6 +46,7 @@ class Text_Feature_Extracter:
         
         data = data[1:]
         return data
+
 
 class Speech_To_Text_Features:
     def __init__(self, mname_asr, mname_txt):
