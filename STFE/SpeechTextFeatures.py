@@ -28,7 +28,7 @@ class Text_Feature_Extracter:
         # model_name from https://huggingface.co/models (bert-base-uncased preferrably)
         self.model_name = model_name
         self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
-        self.model = TFBertModel.from_pretrained(self.model)
+        self.model = TFBertModel.from_pretrained(self.model_name)
 
     def features_fromtext(self, text):
         encoded = self.tokenizer(text, padding = 'max_length', return_tensors = 'tf')

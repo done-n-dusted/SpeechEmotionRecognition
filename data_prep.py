@@ -14,7 +14,7 @@ emotion_key = {
     'surprise'  : 6
 }
 
-mname_txt = 'bert-base-uncased preferrably'
+mname_txt = 'bert-base-uncased'
 
 TFE = Text_Feature_Extracter(mname_txt)
 
@@ -27,7 +27,7 @@ def data_to_target(data_frame, set):
     print('Preparing data for ' + set)
     for u, e, d, uid in tqdm(req):
         feats = TFE.features_fromtext(u)
-        pd.to_csv('../data/' + set + '/' + e + '/dia' + d + '_utt' + uid + '.csv', header = None)
+        pd.DataFrame(feats).to_csv('../data/' + set + '/' + e + '/dia' + str(d) + '_utt' + str(uid) + '.csv', header = None, index = False)
         np.concatenate([X, feats])
     
     return X[1:], np.array(y)
