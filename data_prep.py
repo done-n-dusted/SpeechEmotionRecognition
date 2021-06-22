@@ -5,13 +5,13 @@ from STFE.SpeechTextFeatures import *
 from tqdm import tqdm
 
 emotion_key = {
-    'anger'     : 0,
-    'disgust'   : 1,
-    'fear'      : 2,
-    'joy'       : 3,
-    'neutral'   : 4,
-    'sadness'   : 5,
-    'surprise'  : 6
+    'anger'     : [1, 0, 0, 0, 0, 0, 0],
+    'disgust'   : [0, 1, 0, 0, 0, 0, 0],
+    'fear'      : [0, 0, 1, 0, 0, 0, 0],
+    'joy'       : [0, 0, 0, 1, 0, 0, 0],
+    'neutral'   : [0, 0, 0, 0, 1, 0, 0],
+    'sadness'   : [0, 0, 0, 0, 0, 1, 0],
+    'surprise'  : [0, 0, 0, 0, 0, 0, 1]
 }
 
 mname_txt = 'bert-base-uncased'
@@ -42,3 +42,5 @@ X_test, y_test = data_to_target(test_csv, 'test')
 X_dev, y_dev = data_to_target(dev_csv, 'dev')
 
 print('Done prepping data')
+
+np.save('../all_data.npy', [X_train, y_train, X_test, y_test, X_dev, y_dev])
