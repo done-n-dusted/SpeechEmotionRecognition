@@ -28,7 +28,7 @@ def data_to_target(data_frame, set):
     for u, e, d, uid in tqdm(req):
         feats = TFE.features_fromtext(u)
         pd.DataFrame(feats).to_csv('../data/' + set + '/' + e + '/dia' + str(d) + '_utt' + str(uid) + '.csv', header = None, index = False)
-        np.concatenate([X, feats])
+        X = np.concatenate([X, feats])
     
     return X[1:], np.array(y)
 
@@ -43,4 +43,4 @@ X_dev, y_dev = data_to_target(dev_csv, 'dev')
 
 print('Done prepping data')
 
-np.save('../all_data.npy', [X_train, y_train, X_test, y_test, X_dev, y_dev])
+np.save('../all_data.npy', np.array([X_train, y_train, X_test, y_test, X_dev, y_dev]))
