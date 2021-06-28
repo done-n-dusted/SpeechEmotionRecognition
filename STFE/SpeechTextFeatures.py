@@ -53,7 +53,7 @@ class Speech_To_Text_Features:
         self.SR = Speech_Recognizer(mname_asr)
         self.TFE = Text_Feature_Extracter(mname_txt)
 
-    def get_text_features(self, ):
+    def get_text_features(self, audio_file_name):
         transcription = SR.transcribe(audio_file_name)
         txt_features = TFE.features_fromtext(transcription)
         return txt_features

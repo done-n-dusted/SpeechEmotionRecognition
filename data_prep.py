@@ -21,14 +21,14 @@ TFE = Text_Feature_Extracter(mname_txt)
 def data_to_target(data_frame, set):
     req = np.array(data_frame[['Utterance', 'Emotion', 'Dialogue_ID', 'Utterance_ID']])
 
-    X = np.array([0]*768)
+    X = [np.array([0]*768)]
     y = [emotion_key[x] for x in data_frame['Emotion']]
 
     print('Preparing data for ' + set)
     for u, e, d, uid in tqdm(req):
         feats = TFE.features_fromtext(u)
         pd.DataFrame(feats).to_csv('../data/' + set + '/' + e + '/dia' + str(d) + '_utt' + str(uid) + '.csv', header = None, index = False)
-        X = np.concatenate([X, feats])
+        X = np.concatenate([X, [feats]])
     
     return X[1:], np.array(y)
 
