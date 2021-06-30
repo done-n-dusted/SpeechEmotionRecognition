@@ -1,6 +1,6 @@
 import numpy as np
 
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, Concatenate, Reshape, GRU, Bidirectional
 from tensorflow.keras import optimizers
 from tensorflow.keras.callbacks import EarlyStopping
@@ -13,7 +13,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 
 class General_model:
     def __init__(self, class_names, name):
-        self.metrics = {}
+        self.metrics = {"NAME" : name}
         self.name = name
         self.class_names = class_names
         self.num_classes = len(class_names)
@@ -69,6 +69,14 @@ class General_model:
             return self.metrics, preds
 
         return self.metrics
+
+    def save_model(self, location):
+        self.model.save(location)
+        print("Saved model at ", location )
+
+    def load_model(self, location):
+        print("Loading model from ", location)
+        self.model = load_model(location)
 
 
 class NormalNeuralNetwork(General_model):

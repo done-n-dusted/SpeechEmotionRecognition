@@ -2,7 +2,7 @@ import numpy as np
 
 from sklearn import preprocessing
 
-class DataOrganizer:
+class DataPreparer:
 
     def __init__(self, file_name):
         

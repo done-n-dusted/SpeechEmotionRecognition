@@ -33,9 +33,9 @@ def data_to_target(data_frame, set):
     return X[1:], np.array(y)
 
 
-train_csv = pd.read_csv('train_sent_emo.csv')
-test_csv = pd.read_csv('test_sent_emo.csv')
-dev_csv = pd.read_csv('dev_sent_emo.csv')
+train_csv = pd.read_csv('text_csv/train_sent_emo.csv')
+test_csv = pd.read_csv('text_csv/test_sent_emo.csv')
+dev_csv = pd.read_csv('text_csv/dev_sent_emo.csv')
 
 X_train, y_train = data_to_target(train_csv, 'train')
 X_test, y_test = data_to_target(test_csv, 'test')
