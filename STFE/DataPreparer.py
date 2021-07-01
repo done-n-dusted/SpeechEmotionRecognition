@@ -23,11 +23,21 @@ class DataPreparer:
         self.X_dev = make_X(data[4])
         self.y_dev = data[5]
 
+        self.ss = preprocessing.StandardScaler()
+        self.mm = preprocessing.MinMaxScaler()
 
-    def scale_data(self, scaler = preprocessing.StandardScalar()):
-        self.X_train = scalar.fit_transform(X_train)
-        self.X_test = scalar.transform(X_test)
-        self.X_dev = scalar.transform(X_dev)
+    def scale_data(self, scaler = 'standard'):
+        
+        if scaler == 'standard':
+            scaler = self.ss
+        elif scaler == 'minmax':
+            scaler = self.mm
+        else:
+            print("Invalid scaler. Choose either standard or minmax")
+
+        self.X_train = scaler.fit_transform(self.X_train)
+        self.X_test = scaler.transform(self.X_test)
+        self.X_dev = scaler.transform(self.X_dev)
 
     def set_timestep(self, time_step):
 
