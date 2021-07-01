@@ -26,22 +26,26 @@ class General_model:
         self.model.compile(loss = 'categorical_crossentropy',
                             optimizer = opt,
                             metrics = ['accuracy'])
+        self.metrics['opt'] = opt
         print('Model compiled')
     
 
-    def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev):
+    def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev, save_fig = True):
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
                         epochs = num_epochs, 
                         callbacks = [self.early_stopping],
                         class_weight = cw)
 
-        plt.figure()
-        plt.plot(ist.history['loss'])
-        plt.title('Loss')
-        plt.xlabel('epoch')
-        plt.ylabel('loss')
-        plt.savefig(self.name + '_loss.png')
+        if save_fig:
+            plt.figure()
+            plt.plot(ist.history['loss'])
+            plt.title('Loss')
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.savefig(self.name + '_loss.png')
+
+        return hist
 
     def get_model(self):
         return self.model
@@ -95,6 +99,7 @@ class NormalNeuralNetwork(General_model):
 
         print(self.name + " model created")
         print(self.model.summary())        
+        self.metrics["Summary"] = self.model.summary()
 
 class BC_LSTM(General_model):
     def __init__(self, lstmdim, dropout_size, class_names, inp_shape):
@@ -110,3 +115,4 @@ class BC_LSTM(General_model):
 
         print(self.name + " model created")
         print(self.model.summary())
+        self.metrics["Summary"] = self.model.summary

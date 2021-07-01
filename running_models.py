@@ -20,29 +20,35 @@ DP.scale_data()
 DP.set_timestep(time_step)
 X_train, y_train, X_test, y_test, X_dev, y_dev = DP.get_matrices()
 
-
 print("\nOrganized data for training\n")
 
-print('\nBCLSTM MODEL\n')
-bclstm = Models.BC_LSTM(10, 0.3, class_names, (30, 768, ))
-bclstm.model_compile(sgd)
-bclstm.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev)
+while(True):
+    model_name = input("BCLSTM or NNN\n")
 
-bclstm_metrics = bclstm.get_metrics(X_test, y_test)
-dump_dict(bclstm_metrics, 'result/bclstm.json')
-print("METRICS\n")
-print(bclstm)
+    if model_name == 'BCLSTM':
+        print('\nBCLSTM MODEL\n')
+        bclstm = Models.BC_LSTM(10, 0.3, class_names, (30, 768, ))
+        bclstm.model_compile(sgd)
+        bclstm.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev)
 
-print('\nNEURAL NETWORK MODEL\n')
+        bclstm_metrics = bclstm.get_metrics(X_test, y_test)
+        dump_dict(bclstm_metrics, 'result/bclstm.json')
+        print("METRICS\n")
+        print(bclstm)
+        break
 
-nnn = Models.NormalNeuralNetwork(0.3, class_names, (768, ))
-nnn.model_compile(sgd)
-nnn.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev)
+    elif model_name == 'NNN':
+        print('\nNEURAL NETWORK MODEL\n')
 
-nnn_metrics = nnn.get_metrics(X_test, y_test)
-dump_dict(nnn_metrics, 'result/nnn.json')
-print("METRICS\n")
-print(nnn_metrics)
+        nnn = Models.NormalNeuralNetwork(0.3, class_names, (768, ))
+        nnn.model_compile(sgd)
+        nnn.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev)
 
+        nnn_metrics = nnn.get_metrics(X_test, y_test)
+        dump_dict(nnn_metrics, 'result/nnn.json')
+        print("METRICS\n")
+        print(nnn_metrics)
+        break
 
-
+    else:
+        print("Invalid Model name")
