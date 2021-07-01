@@ -125,4 +125,4 @@ class BC_LSTM(General_model):
 
         print(self.name + " model created")
         print(self.model.summary())
-        self.metrics["Summary"] = self.model.summary
+        self.metrics["Summary"] = self.model.summary()
