@@ -109,7 +109,7 @@ class NormalNeuralNetwork(General_model):
 
         print(self.name + " model created")
         print(self.model.summary())        
-        self.metrics["Summary"] = self.model.summary()
+        self.metrics["Summary"] = str(self.model.summary())
 
 class BC_LSTM(General_model):
     def __init__(self, lstmdim, dropout_size, class_names, inp_shape):
@@ -125,4 +125,4 @@ class BC_LSTM(General_model):
 
         print(self.name + " model created")
         print(self.model.summary())
-        self.metrics["Summary"] = self.model.summary()
+        self.metrics["Summary"] = str(self.model.summary())
