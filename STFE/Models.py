@@ -2,6 +2,7 @@ import numpy as np
 
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, Concatenate, Reshape, GRU, Bidirectional, Dropout
+from tensorflow.keras.layers import Conv1D, Flatten
 from tensorflow.keras import optimizers
 from tensorflow.keras.callbacks import EarlyStopping
 
@@ -121,6 +122,23 @@ class BC_LSTM(General_model):
         self.model.add(Bidirectional(LSTM(lstmdim, dropout=dropout_size, return_sequences = True)))
         self.model.add(Bidirectional(LSTM(lstmdim, dropout=dropout_size)))
 
+        self.model.add(Dense(self.num_classes, activation = 'softmax'))
+
+        print(self.name + " model created")
+        print(self.model.summary())
+        self.metrics["Summary"] = self.model.summary()
+
+class TextCNN(General_model):
+    def __init__(self, class_names, inp_shape):
+        General_model.__init__(self, class_names, 'textCNN')
+
+        self.model.add(Input(shape = inp_shape))
+
+        self.model.add(Conv1D(32, 3, padding = 'same', activation = 'relu'))
+        # self.model.add(Conv1D(64, 4, padding = 'same', activation = 'relu'))
+        self.model.add(Flatten())
+        self.model.add(Dense(64, activation = 'relu'))
+        self.model.add(Dense(128, activation = 'relu'))
         self.model.add(Dense(self.num_classes, activation = 'softmax'))
 
         print(self.name + " model created")

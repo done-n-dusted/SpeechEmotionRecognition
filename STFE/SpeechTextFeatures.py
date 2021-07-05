@@ -6,7 +6,6 @@ from tqdm import tqdm
 import librosa
 import torch
 
-
 class Speech_Recognizer:
     def __init__(self, model_name):
         # model_name from https://huggingface.co/models?pipeline_tag=automatic-speech-recognition
@@ -23,7 +22,7 @@ class Speech_Recognizer:
         transcription = tokenizer.batch_decode(predicted_ids)[0]
 
 
-class Text_Feature_Extracter:
+class BERT_Text_Feature_Extracter:
     def __init__(self, model_name):
         # model_name from https://huggingface.co/models (bert-base-uncased preferrably)
         self.model_name = model_name
@@ -49,9 +48,14 @@ class Text_Feature_Extracter:
 
 
 class Speech_To_Text_Features:
-    def __init__(self, mname_asr, mname_txt):
+    def __init__(self, mname_asr, text_feature = 'BERT', mname_txt = None):
+        #text_feature = BERT, TCNN
+
         self.SR = Speech_Recognizer(mname_asr)
-        self.TFE = Text_Feature_Extracter(mname_txt)
+        if text_feature == 'BERT':
+            self.TFE = BERT_Text_Feature_Extracter(mname_txt)
+        elif text_feature == 'TCNN':
+            self.TFE = TCNN_Text_Feature_Extracter()
 
     def get_text_features(self, audio_file_name):
         transcription = SR.transcribe(audio_file_name)

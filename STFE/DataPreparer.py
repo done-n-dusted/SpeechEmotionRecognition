@@ -6,21 +6,21 @@ class DataPreparer:
 
     def __init__(self, file_name):
         
-        def make_X(x):
-            res = []
-            x = x[767:]
-            for i in range(0, x.shape[0], 768):
-        #         print(i)
-                res.append(np.array(x[i:i+768]))
-            print(np.array(res).shape)
-            return np.array(res)    
+        # def make_X(x):
+        #     res = []
+        #     # x = x[767:]
+        #     for i in range(0, x.shape[0], 768):
+        # #         print(i)
+        #         res.append(np.array(x[i:i+768]))
+        #     print(np.array(res).shape)
+        #     return np.array(res)    
 
-        data = np.load('./all_data.npy', allow_pickle = True)
-        self.X_train = make_X(data[0])
+        data = np.load(file_name, allow_pickle = True)
+        self.X_train = data[0]
         self.y_train = data[1]
-        self.X_test = make_X(data[2])
+        self.X_test = data[2]
         self.y_test = data[3]
-        self.X_dev = make_X(data[4])
+        self.X_dev = data[4]
         self.y_dev = data[5]
 
         self.ss = preprocessing.StandardScaler()
