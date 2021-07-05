@@ -11,14 +11,19 @@ def dump_dict(dict, file_name):
         json.dump(dict, convert_file)
 
 
-DP = DataPreparer.DataPreparer('all_data.npy')
+# DP = DataPreparer.DataPreparer('all_data.npy')
 
-class_names = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise']
+DP = DataPreparer.DataPreparer('anger_and_sad_only.npy')
+
+
+# class_names = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise']
+class_names = ['anger', 'sadness']
+
 time_step = 30
 sgd = optimizers.SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
-cws = [4.0, 15.0, 15.0, 3.0, 1.0, 6.0, 3.0]
+cws = [1, 1.8]
 class_weights = {}
-for i in range(7):
+for i in range(len(class_names)):
     class_weights[i] = cws[i]
 
 print(class_weights)
@@ -29,7 +34,7 @@ DP.scale_data()
 print("\nOrganized data for training\n")
 
 while(True):
-    model_name = input("BCLSTM or NNN\n")
+    model_name = input("BCLSTM or NNN or TEXTCNN\n")
 
     if model_name == 'BCLSTM':
         DP.set_timestep(time_step)
@@ -62,5 +67,22 @@ while(True):
         print(nnn_metrics)
         break
 
+    elif model_name == 'TEXTCNN':
+
+        DP.set_timestep(5)
+        X_train, y_train, X_test, y_test, X_dev, y_dev = DP.get_matrices()
+
+        print('\nTEXT CONV NEURAL NETWORK\n')
+
+        nnn = Models.TextCNN(class_names, (5, 768, ))
+        nnn.model_compile(sgd)
+        nnn.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev)
+
+        nnn_metrics = nnn.get_metrics(X_test, y_test)
+        print(nnn_metrics)
+        dump_dict(nnn_metrics, 'result/text_cnn.json')
+        print("METRICS\n")
+        print(nnn_metrics)
+        break
     else:
         print("Invalid Model name")
