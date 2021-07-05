@@ -56,7 +56,7 @@ if __name__ == '__main__':
     TC = TextCNN(sec_train)
     model = TC.make_model()
 
-    sen = 'Oh ym god I see you walking by'
+    sen = 'Oh my god I see you walking by'
     seq = TC.transform_docs([sen])
     print(model.predict(seq))
 
