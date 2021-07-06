@@ -18,7 +18,7 @@ FE = TCNN_feature_extracter(train_csv['Utterance'])
 def data_to_target(data_frame, set):
     req = np.array(data_frame[['Utterance', 'Emotion', 'Dialogue_ID', 'Utterance_ID']])
     
-    X = np.array([np.array([0]*100)])
+    X = np.array([np.array([0]*500)])
     y = []
 
     print('\nPreparing data for ' + set)

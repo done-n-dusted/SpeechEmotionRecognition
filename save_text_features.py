@@ -22,9 +22,9 @@ emotion_key = {
     'sadness' : [0, 1]
 }
 
-mname_txt = 'bert-base-uncased'
+mname_txt = 'bert-base-cased'
 
-TFE = Text_Feature_Extracter(mname_txt)
+TFE = BERT_Text_Feature_Extracter(mname_txt)
 
 def data_to_target(data_frame, set):
     req = np.array(data_frame[['Utterance', 'Emotion', 'Dialogue_ID', 'Utterance_ID']])

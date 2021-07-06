@@ -2,7 +2,9 @@ import numpy as np
 
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, Concatenate, Reshape, GRU, Bidirectional, Dropout
-from tensorflow.keras.layers import Conv1D, Flatten
+from tensorflow.keras.layers import Conv1D, Flatten, TimeDistributed
+from tensorflow.keras.layers import BatchNormalization
+
 from tensorflow.keras import optimizers
 from tensorflow.keras.callbacks import EarlyStopping
 
@@ -22,7 +24,7 @@ class General_model:
 
         self.model = Sequential()
 
-        self.early_stopping = EarlyStopping(monitor='loss', patience=10)
+        self.early_stopping = EarlyStopping(monitor='val_loss', patience=10)
 
     def model_compile(self, opt):
         self.model.compile(loss = 'categorical_crossentropy',
@@ -32,12 +34,11 @@ class General_model:
         print('Model compiled')
     
 
-    def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev, save_fig = True):
+    def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev, save_fig = True, fig_name = None):
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
-                        epochs = num_epochs, 
-                        callbacks = [self.early_stopping],
-                        class_weight = cw)
+                        epochs = num_epochs,
+                        class_weight = cw, batch_size = 32)
 
         if save_fig:
             plt.figure()
@@ -45,7 +46,7 @@ class General_model:
             plt.title('Loss')
             plt.xlabel('epoch')
             plt.ylabel('loss')
-            plt.savefig('result/loss_graphs/' + self.name + '_loss.png')
+            plt.savefig('result/loss_graphs/' + fig_name + '_loss.png')
 
         return hist
 
@@ -101,10 +102,12 @@ class NormalNeuralNetwork(General_model):
         
         self.model.add(Input(shape = inp_shape))
 
-        self.model.add(Dense(512, activation = 'relu'))
+        self.model.add(Dense(256, activation = 'tanh'))
+        self.model.add(BatchNormalization())
         self.model.add(Dropout(dropout_size))
-        self.model.add(Dense(128, activation = 'relu'))
-        self.model.add(Dense(64, activation = 'relu'))
+        self.model.add(Dense(64, activation = 'tanh'))
+        self.model.add(BatchNormalization())
+        self.model.add(Dense(16, activation = 'tanh'))
 
         self.model.add(Dense(self.num_classes, activation = 'softmax'))
 
@@ -119,9 +122,16 @@ class BC_LSTM(General_model):
 
         self.model.add(Input(shape = inp_shape))
 
-        self.model.add(Bidirectional(LSTM(lstmdim, dropout=dropout_size, return_sequences = True)))
-        self.model.add(Bidirectional(LSTM(lstmdim, dropout=dropout_size)))
+        self.model.add(Bidirectional(LSTM(lstmdim, return_sequences = True, kernel_initializer='random_normal')))
+        self.model.add(BatchNormalization())
+        self.model.add(Bidirectional(LSTM(lstmdim, kernel_initializer='random_normal')))
+        self.model.add(BatchNormalization())
+        # self.model.add(LSTM(128, kernel_initializer='random_normal'))
+        # self.model.add(BatchNormalization())
 
+        self.model.add(Dense(100, activation = 'relu'))
+        self.model.add(Dropout(0.5))
+        # self.model.add(Dense(50, activation = 'relu'))
         self.model.add(Dense(self.num_classes, activation = 'softmax'))
 
         print(self.name + " model created")
@@ -135,7 +145,7 @@ class TextCNN(General_model):
         self.model.add(Input(shape = inp_shape))
 
         self.model.add(Conv1D(32, 3, padding = 'same', activation = 'relu'))
-        # self.model.add(Conv1D(64, 4, padding = 'same', activation = 'relu'))
+        self.model.add(Conv1D(64, 4, padding = 'same', activation = 'relu'))
         self.model.add(Flatten())
         self.model.add(Dense(64, activation = 'relu'))
         self.model.add(Dense(128, activation = 'relu'))

@@ -16,7 +16,7 @@ class TextCNN:
         self.tokenizer = Tokenizer(num_words=5000)
         self.tokenizer.fit_on_texts(sentences_train)
         self.vocab_size = len(self.tokenizer.word_index) + 1
-        self.maxlen = 100
+        self.maxlen = 500
         self.model = Sequential()
 
     def transform_docs(self, docs):
@@ -27,14 +27,16 @@ class TextCNN:
 
     def make_model(self):
 
-        embedding_dim = 50
+        embedding_dim = 80
         self.model.add(layers.Embedding(input_dim = self.vocab_size, output_dim = embedding_dim, input_length = self.maxlen, trainable = False))
         self.model.add(layers.Reshape((self.maxlen, embedding_dim, 1)))
         self.model.add(layers.Conv2D(32, (3, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
         self.model.add(layers.Conv2D(32, (4, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
         self.model.add(layers.Conv2D(16, (5, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
+        self.model.add(layers.MaxPooling2D(pool_size = (3, 3), padding = 'valid'))
+        self.model.add(layers.MaxPooling2D(pool_size = (2, 2), padding = 'valid'))
         self.model.add(layers.Flatten())
-        self.model.add(layers.Dense(100, activation = 'tanh'))
+        self.model.add(layers.Dense(500, activation = 'tanh'))
         
         self.model.summary()
         # self.model.compile(optimizer='adam', loss='rmse', metrics=['accuracy'])
