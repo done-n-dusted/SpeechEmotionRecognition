@@ -42,7 +42,7 @@ while(True):
         X_train, y_train, X_test, y_test, X_dev, y_dev = DP.get_matrices()
 
         print('\nBCLSTM MODEL\n')
-        bclstm = Models.BC_LSTM(500, 0.3, class_names, (time_step, 500, ))
+        bclstm = Models.BC_LSTM(150, 0.3, class_names, (time_step, 150, ))
         bclstm.model_compile(adam)
         bclstm.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev, fig_name = 'TCNN_BLSTM')
 
@@ -57,9 +57,9 @@ while(True):
 
         print('\nNEURAL NETWORK MODEL\n')
 
-        nnn = Models.NormalNeuralNetwork(0.3, class_names, (500, ))
+        nnn = Models.NormalNeuralNetwork(0.3, class_names, (150, ))
         nnn.model_compile(sgd)
-        nnn.model_fit(class_weights, 300, X_train, y_train, X_dev, y_dev, fig_name = 'TCNN_NN')
+        nnn.model_fit(class_weights, 500, X_train, y_train, X_dev, y_dev, fig_name = 'TCNN_NN')
 
         nnn_metrics = nnn.get_metrics(X_test, y_test)
         print(nnn_metrics)
@@ -74,7 +74,7 @@ while(True):
 
         print('\nTEXT CONV NEURAL NETWORK\n')
 
-        nnn = Models.TextCNN(class_names, (5, 500, ))
+        nnn = Models.TextCNN(class_names, (5, 150, ))
         nnn.model_compile(sgd)
         nnn.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev, fig_name = 'tcnn_tcnn')
 

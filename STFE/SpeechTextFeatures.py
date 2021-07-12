@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
+
 from transformers import Wav2Vec2ForMaskedLM, Wav2Vec2Tokenizer
 from transformers import BertTokenizer, TFBertModel
 import pandas as pd
@@ -5,6 +8,7 @@ import numpy as np
 from tqdm import tqdm
 import librosa
 import torch
+import soundfile as sf
 
 class Speech_Recognizer:
     def __init__(self, model_name):
@@ -14,12 +18,14 @@ class Speech_Recognizer:
         self.model = Wav2Vec2ForMaskedLM.from_pretrained(self.model_name)
 
     def transcribe(self, audio_file_name):
-        audio_input, sampling_rate = librosa.load(audio_file_name, sr = 160000, res_type = 'kaiser_fast')
-
-        input_values = self.tokenizer(audio_input, return_tensors = 'tf').input_values
-        logits = model(input_values).logits
+        # audio_input, sampling_rate = librosa.load(audio_file_name, sr = 160000, res_type = 'kaiser_fast')
+        audio_input, _ = sf.read(audio_file_name)
+        # print(len(audio_input))
+        input_values = self.tokenizer(audio_input[:int(len(audio_input)/2)], return_tensors = 'pt').input_values
+        logits = self.model(input_values).logits
         predicted_ids = torch.argmax(logits, dim = -1)
-        transcription = tokenizer.batch_decode(predicted_ids)[0]
+        transcription = self.tokenizer.batch_decode(predicted_ids)[0]
+        return transcription.lower()
 
 
 class BERT_Text_Feature_Extracter:
@@ -61,3 +67,5 @@ class Speech_To_Text_Features:
         transcription = SR.transcribe(audio_file_name)
         txt_features = TFE.features_fromtext(transcription)
         return txt_features
+
+    

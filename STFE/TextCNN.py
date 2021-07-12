@@ -16,7 +16,7 @@ class TextCNN:
         self.tokenizer = Tokenizer(num_words=5000)
         self.tokenizer.fit_on_texts(sentences_train)
         self.vocab_size = len(self.tokenizer.word_index) + 1
-        self.maxlen = 500
+        self.maxlen = 200
         self.model = Sequential()
 
     def transform_docs(self, docs):
@@ -27,16 +27,32 @@ class TextCNN:
 
     def make_model(self):
 
+        # for line in f:
+        #     values = line.split()
+        #     word = values[0]
+        #     coefs = asarray(values[1:], dtype='float32')
+        #     embeddings_index[word] = coefs
+        # f.close()
+        # print('Loaded %s word vectors.' % len(embeddings_index))
+        # # create a weight matrix for words in training docs
+        # embedding_matrix = zeros((vocab_size, 100))
+        # for word, i in t.word_index.items():
+        #     embedding_vector = embeddings_index.get(word)
+        #     if embedding_vector is not None:
+        #         embedding_matrix[i] = embedding_vector
+        
         embedding_dim = 80
         self.model.add(layers.Embedding(input_dim = self.vocab_size, output_dim = embedding_dim, input_length = self.maxlen, trainable = False))
         self.model.add(layers.Reshape((self.maxlen, embedding_dim, 1)))
-        self.model.add(layers.Conv2D(32, (3, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
-        self.model.add(layers.Conv2D(32, (4, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
-        self.model.add(layers.Conv2D(16, (5, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
-        self.model.add(layers.MaxPooling2D(pool_size = (3, 3), padding = 'valid'))
-        self.model.add(layers.MaxPooling2D(pool_size = (2, 2), padding = 'valid'))
+        self.model.add(layers.Conv2D(64, (3, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
+        self.model.add(layers.Conv2D(64, (4, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
+        self.model.add(layers.Conv2D(64, (5, embedding_dim), padding = 'same', activation = 'relu', kernel_initializer='normal', trainable = False))
+        self.model.add(layers.GlobalMaxPool2D())
+        # self.model.add(layers.MaxPooling2D(pool_size = (3, 3), padding = 'valid'))
+        # self.model.add(layers.MaxPooling2D(pool_size = (2, 2), padding = 'valid'))
         self.model.add(layers.Flatten())
-        self.model.add(layers.Dense(500, activation = 'tanh'))
+        # self.model.add(layers.GlobalMaxPool1D())
+        self.model.add(layers.Dense(150, activation = 'relu'))
         
         self.model.summary()
         # self.model.compile(optimizer='adam', loss='rmse', metrics=['accuracy'])
