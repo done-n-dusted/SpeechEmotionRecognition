@@ -13,7 +13,7 @@ def dump_dict(dict, file_name):
 
 # DP = DataPreparer.DataPreparer('all_data.npy')
 
-DP = DataPreparer.DataPreparer('anger_and_sad_only.npy')
+DP = DataPreparer.DataPreparer('anger_and_sad_uncased.npy')
 
 
 # class_names = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise']
@@ -43,10 +43,10 @@ while(True):
         print('\nBCLSTM MODEL\n')
         bclstm = Models.BC_LSTM(10, 0.3, class_names, (30, 768, ))
         bclstm.model_compile(sgd)
-        bclstm.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev, fig_name = 'cased_BCLSTM')
+        bclstm.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev, fig_name = 'uncased_BCLSTM')
 
         bclstm_metrics = bclstm.get_metrics(X_test, y_test)
-        dump_dict(bclstm_metrics, 'result/cased_bclstm.json')
+        dump_dict(bclstm_metrics, 'result/bclstm.json')
         print("METRICS\n")
         print(bclstm)
         break
@@ -58,11 +58,11 @@ while(True):
 
         nnn = Models.NormalNeuralNetwork(0.3, class_names, (768, ))
         nnn.model_compile(sgd)
-        nnn.model_fit(class_weights, 150, X_train, y_train, X_dev, y_dev, fig_name = 'cased_NNN')
+        nnn.model_fit(class_weights, 250, X_train, y_train, X_dev, y_dev, fig_name = 'uncased_NNN')
 
         nnn_metrics = nnn.get_metrics(X_test, y_test)
         print(nnn_metrics)
-        dump_dict(nnn_metrics, 'result/cased_nnn.json')
+        dump_dict(nnn_metrics, 'result/uncased_nnn.json')
         print("METRICS\n")
         print(nnn_metrics)
         break

@@ -24,7 +24,7 @@ class Speech_Recognizer:
 
 class BERT_Text_Feature_Extracter:
     def __init__(self, model_name):
-        # model_name from https://huggingface.co/models (bert-base-uncased preferrably)
+        # model_name from https://huggingface.co/models (bert-base-cased preferrably)
         self.model_name = model_name
         self.tokenizer = BertTokenizer.from_pretrained(self.model_name)
         self.model = TFBertModel.from_pretrained(self.model_name)

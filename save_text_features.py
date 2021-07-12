@@ -22,7 +22,7 @@ emotion_key = {
     'sadness' : [0, 1]
 }
 
-mname_txt = 'bert-base-cased'
+mname_txt = 'bert-base-uncased'
 
 TFE = BERT_Text_Feature_Extracter(mname_txt)
 
@@ -63,4 +63,4 @@ X_dev, y_dev = data_to_target(dev_csv, 'dev')
 print('Done prepping data')
 print(X_train.shape)
 
-np.save('./anger_and_sad_only.npy', np.array([X_train, y_train, X_test, y_test, X_dev, y_dev]))
+np.save('./anger_and_sad_uncased.npy', np.array([X_train, y_train, X_test, y_test, X_dev, y_dev]))
