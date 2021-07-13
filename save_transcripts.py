@@ -34,7 +34,7 @@ def save_transcripts(source, set_name, class_name, noise_name, db):
 
 source = '../MELD_noise/'
 set_names = ['train', 'test', 'dev']
-noises = ['airport', 'babble']
+noises = ['airport']
 # set_name = 'dev'
 # noise_name = 'airport'
 dbs = ['0dB', '10dB', '20dB']
@@ -49,7 +49,7 @@ for set_name in set_names:
             result = anger_df.append(sadness_df, sort = True, ignore_index = True)
 
 
-            print(name, 'Done')
             name = './noise_csv/' + set_name + '_' + noise_name + '_' + db + '.csv'
+            print(name, 'Done')
 
             result.to_csv(name)

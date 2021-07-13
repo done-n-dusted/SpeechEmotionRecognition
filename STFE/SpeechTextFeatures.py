@@ -18,8 +18,8 @@ class Speech_Recognizer:
         self.model = Wav2Vec2ForMaskedLM.from_pretrained(self.model_name)
 
     def transcribe(self, audio_file_name):
-        # audio_input, sampling_rate = librosa.load(audio_file_name, sr = 160000, res_type = 'kaiser_fast')
-        audio_input, _ = sf.read(audio_file_name)
+        audio_input, sampling_rate = librosa.load(audio_file_name, sr = 16000, res_type = 'kaiser_fast')
+        # audio_input, _ = sf.read(audio_file_name)
         # print(len(audio_input))
         input_values = self.tokenizer(audio_input[:int(len(audio_input)/2)], return_tensors = 'pt').input_values
         logits = self.model(input_values).logits
