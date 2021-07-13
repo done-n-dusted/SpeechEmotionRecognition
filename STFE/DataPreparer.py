@@ -2,26 +2,15 @@ import numpy as np
 
 from sklearn import preprocessing
 
-class DataPreparer:
+class ParentDataPrep:
 
-    def __init__(self, file_name):
-        
-        # def make_X(x):
-        #     res = []
-        #     # x = x[767:]
-        #     for i in range(0, x.shape[0], 768):
-        # #         print(i)
-        #         res.append(np.array(x[i:i+768]))
-        #     print(np.array(res).shape)
-        #     return np.array(res)    
-
-        data = np.load(file_name, allow_pickle = True)
-        self.X_train = data[0]
-        self.y_train = data[1]
-        self.X_test = data[2]
-        self.y_test = data[3]
-        self.X_dev = data[4]
-        self.y_dev = data[5]
+    def __init__(self, X_train, y_train, X_test, y_test, X_dev, y_dev):
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_test = X_test
+        self.y_test = y_test
+        self.X_dev = X_dev
+        self.y_dev = y_dev
 
         self.ss = preprocessing.StandardScaler()
         self.mm = preprocessing.MinMaxScaler()
@@ -61,3 +50,29 @@ class DataPreparer:
     def get_matrices(self):
         return self.X_train, self.y_train, self.X_test, self.y_test, self.X_dev, self.y_dev
 
+
+class DataPreparer(ParentDataPrep):
+
+    def __init__(self, file_name):
+        
+        # def make_X(x):
+        #     res = []
+        #     # x = x[767:]
+        #     for i in range(0, x.shape[0], 768):
+        # #         print(i)
+        #         res.append(np.array(x[i:i+768]))
+        #     print(np.array(res).shape)
+        #     return np.array(res)    
+
+        data = np.load(file_name, allow_pickle = True)
+        self.X_train = data[0]
+        self.y_train = data[1]
+        self.X_test = data[2]
+        self.y_test = data[3]
+        self.X_dev = data[4]
+        self.y_dev = data[5]
+
+        self.ss = preprocessing.StandardScaler()
+        self.mm = preprocessing.MinMaxScaler()
+
+    
