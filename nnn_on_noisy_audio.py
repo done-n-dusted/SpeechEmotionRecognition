@@ -29,7 +29,7 @@ def data_to_target(data_frame, set):
     X = np.array([np.array([0]*768)])
     y = []
 
-    print('\nPreparing data for ' + set)
+    print('\nPreparing data from ' + set)
     for u, e in tqdm(req):
         
         if pd.isna(u) == False:
@@ -40,7 +40,7 @@ def data_to_target(data_frame, set):
     return X[1:], np.array(y)
 
 noise_name = "airport"
-db = "0dB"
+db = "10dB"
 
 name = noise_name + '_' + db
 train_csv = pd.read_csv('noise_csv/train_' + noise_name + '_' + db + '.csv')

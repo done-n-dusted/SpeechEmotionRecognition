@@ -34,7 +34,7 @@ def save_transcripts(source, set_name, class_name, noise_name, db):
 
 source = '../MELD_noise/'
 set_names = ['train', 'test', 'dev']
-noises = ['airport']
+noises = ['babble']
 # set_name = 'dev'
 # noise_name = 'airport'
 dbs = ['0dB', '10dB', '20dB']
