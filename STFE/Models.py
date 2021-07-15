@@ -38,8 +38,8 @@ class General_model:
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
                         epochs = num_epochs,
-                        class_weight = cw, batch_size = 32, verbose = 2)
-                        # callbacks = [self.early_stopping], verbose = 2)
+                        # class_weight = cw, batch_size = 32, verbose = 2)
+                        class_weight = cw, callbacks = [self.early_stopping], verbose = 2)
         print("Done training")
 
         if save_fig:
