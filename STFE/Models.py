@@ -38,12 +38,20 @@ class General_model:
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
                         epochs = num_epochs,
-                        class_weight = cw, batch_size = 32)
+                        class_weight = cw, batch_size = 32, verbose = 2)
+                        # callbacks = [self.early_stopping], verbose = 2)
+        print("Done training")
 
         if save_fig:
             plt.figure()
+            plt.subplot(1, 2, 1)
             plt.plot(hist.history['loss'])
             plt.title('Loss')
+            plt.xlabel('epoch')
+            plt.ylabel('loss')
+            plt.subplot(1, 2, 2)
+            plt.plot(hist.history['val_loss'])
+            plt.title('VAL Loss')
             plt.xlabel('epoch')
             plt.ylabel('loss')
             plt.savefig('result/loss_graphs/' + fig_name + '_loss.png')
