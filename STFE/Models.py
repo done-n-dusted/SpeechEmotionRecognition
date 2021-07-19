@@ -24,7 +24,7 @@ class General_model:
 
         self.model = Sequential()
 
-        self.early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+        self.early_stopping = EarlyStopping(monitor='val_loss', patience=50)
 
     def model_compile(self, opt):
         self.model.compile(loss = 'categorical_crossentropy',
@@ -37,8 +37,8 @@ class General_model:
     def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev, save_fig = True, fig_name = None):
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
-                        epochs = num_epochs,
-                        # class_weight = cw, batch_size = 32, verbose = 2)
+                        epochs = num_epochs, shuffle = True, batch_size = 32,
+                        # class_weight = cw, verbose = 2)
                         class_weight = cw, callbacks = [self.early_stopping], verbose = 2)
         print("Done training")
 
@@ -110,12 +110,13 @@ class NormalNeuralNetwork(General_model):
         
         self.model.add(Input(shape = inp_shape))
 
-        self.model.add(Dense(256, activation = 'tanh'))
+        self.model.add(Dense(256, activation = 'relu'))
         self.model.add(BatchNormalization())
         self.model.add(Dropout(dropout_size))
-        self.model.add(Dense(64, activation = 'tanh'))
+        self.model.add(Dense(128, activation = 'relu'))
         self.model.add(BatchNormalization())
-        self.model.add(Dense(16, activation = 'tanh'))
+        self.model.add(Dense(64, activation = 'relu'))
+        self.model.add(Dense(16, activation = 'relu'))
 
         self.model.add(Dense(self.num_classes, activation = 'softmax'))
 
