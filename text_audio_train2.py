@@ -38,7 +38,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     text_len = 768
     # print(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     # print(gmap_len)
-    # print('#', gmap_len, text_len)
+    # print('# 223', gmap_len, text_len)
     full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
     # print(len(full.columns))
     i = 0
@@ -48,7 +48,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
         msf_curr = msf_dir + f
         txt_curr = txt_dir + f
 
-        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
+        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0], index_col = False)
         gmap_df.drop([0, 1], axis = 1, inplace = True)
         # print('gmap', list(gmap_df.loc[0]))
         msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
@@ -105,22 +105,35 @@ gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
 msf_grand = '../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../mitacs/MELD_text/'
 
-txt_noise = 'clean'
-# aud_noise = txt_noise
-aud_noise = 'clean'
+noise = 'clean'
+noise2 = ['_0dB', '_10dB', '_20dB']
+noise_type = 'airport'
+aud_noise = noise
+txt_noise = noise
 
 
 name = 'text_' + txt_noise + '_aud_' + aud_noise + '_training'
 
-train_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', aud_noise, txt_noise)
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
-dev_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'dev', aud_noise, txt_noise)
+train_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', noise, noise)
+test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', noise, noise)
+dev_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'dev', noise, noise)
 
 X_train, y_train = splitXY(train_csv)
 X_test, y_test = splitXY(test_csv)
 X_dev, y_dev = splitXY(dev_csv)
 
+print(X_train.shape)
+
 # print("Saved files")
+for n in noise2:
+    n1 = noise_type + n
+    print('\n', n1, '\n')
+    dset_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', n1, n1)
+    dx_train, dy_train = splitXY(dset_csv)
+    # print(dx_train.shape)
+    X_train = np.concatenate([X_train, dx_train], axis = 0)
+    y_train = np.concatenate([y_train, dy_train], axis = 0) 
+    # print(X_train.shape)
 
 # DP = DataPreparer.ParentDataPrep(X_train, y_train, X_test, y_test, X_dev, y_dev)
 
@@ -133,7 +146,7 @@ X_dev = scaler.transform(X_dev)
 print(np.max(X_train), np.min(X_train))
 print(np.max(X_dev), np.min(X_dev))
 print(np.max(X_test), np.min(X_test))
-dump(scaler, open('../models/clean_scaler.pkl', 'wb'))
+dump(scaler, open('../models/c_' + noise_type + '_scaler.pkl', 'wb'))
 
 print("Done scaling data")
 
@@ -155,4 +168,4 @@ print(nnn_metrics)
 
 model = nnn.get_model()
 # dump(model, open('../models/clean.pkl', 'wb'))
-model.save('../models/clean.h5', include_optimizer = False)
+model.save('../models/clean_' + noise_type + '.h5', include_optimizer = False)

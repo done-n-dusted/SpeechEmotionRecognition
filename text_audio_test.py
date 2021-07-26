@@ -105,14 +105,17 @@ gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
 msf_grand = '../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../mitacs/MELD_text/'
 
-txt_noise = 'clean'
+txt_noise = 'babble_20dB'
 # aud_noise = txt_noise
-aud_noise = 'babble_0dB'
+aud_noise = 'clean'
+
+scaler_name = '../models/c_airport_scaler.pkl'
+model_name = '../models/clean_airport.h5'
 
 test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
 X_test, y_test = splitXY(test_csv)
 
-scaler = load(open('../models/clean_scaler.pkl', 'rb'))
+scaler = load(open(scaler_name, 'rb'))
 X_test = scaler.transform(X_test)
 
 
@@ -124,7 +127,7 @@ class_names = ['anger', 'sad']
 nnn = Models.NormalNeuralNetwork(0.3, class_names, (X_test.shape[1], ))
 sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.95, nesterov=False)
 
-nnn.l_model('../models/clean.h5', sgd)
+nnn.l_model(model_name, sgd)
 
 nnn_metrics = nnn.get_metrics(X_test, y_test)
 print(nnn_metrics['Bal_Acc'])
