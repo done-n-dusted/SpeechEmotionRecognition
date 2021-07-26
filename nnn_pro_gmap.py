@@ -40,11 +40,11 @@ def get_df(pro_dir, mrs_dir, class_name):
         pro_df.drop([0, 1], axis = 1, inplace = True)
 
         # pro_df = (pro_df - pro_df.min()) / (pro_df.max() - pro_df.min())
-        mrs_df = pd.read_csv(mrs_curr, sep = ';', header = None)
+        mrs_df = pd.read_csv(mrs_curr, sep = ';', header = None, skiprows = [0])
         mrs_df.drop([0, 1], axis = 1, inplace = True)
 
         # print(len(pro_df.columns), len(mrs_df.columns), len(full.columns), req_len)
-        full.loc[i] = list(pro_df.mean(axis = 0)) + list(mrs_df) + [class_name]
+        full.loc[i] = list(pro_df.mean(axis = 0)) + list(mrs_df.loc[0]) + [class_name]
         
         i += 1
     return full
@@ -72,7 +72,7 @@ def splitXY(df):
 pro_grand = '../../mitacs/MELD_noise_prosodic_feat/'
 mrs_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
 
-noise = 'babble_10dB'
+noise = 'clean'
 name = 'pro_gmap_' + noise
 
 train_csv = wrapper(pro_grand, mrs_grand, 'train', noise)

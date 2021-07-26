@@ -10,10 +10,10 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, balanced_accuracy_score
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn import preprocessing
-
+from pickle import load
 
 class General_model:
     def __init__(self, class_names, name):
@@ -27,7 +27,7 @@ class General_model:
         self.early_stopping = EarlyStopping(monitor='val_loss', patience=50)
 
     def model_compile(self, opt):
-        self.model.compile(loss = 'categorical_crossentropy',
+        self.model.compile(loss = 'binary_crossentropy',
                             optimizer = opt,
                             metrics = ['accuracy'])
         # self.metrics['opt'] = str(opt)
@@ -37,8 +37,8 @@ class General_model:
     def model_fit(self, cw, num_epochs, X_train, y_train, X_dev, y_dev, save_fig = True, fig_name = None):
 
         hist = self.model.fit(X_train, y_train, validation_data = (X_dev, y_dev),
-                        epochs = num_epochs, shuffle = True, batch_size = 32,
-                        # class_weight = cw, verbose = 2)
+                        epochs = num_epochs, batch_size = 32, shuffle = True,
+                        # class_weight = cw, verbose  = 2)
                         class_weight = cw, callbacks = [self.early_stopping], verbose = 2)
         print("Done training")
 
@@ -74,20 +74,22 @@ class General_model:
         # self.metrics = {'Loss' : score[0], 'Accuracy' : score[1]}
         self.metrics['Loss'] = score[0]
         self.metrics['Accuracy'] = score[1]
-
         y_pred = self.model.predict(X_test)
+        y_pred = y_pred.reshape(-1)
+        y_pred = np.round(y_pred)
+        # print(y_pred.shape)
+        # y_pred = get_tfarray(y_pred)
 
-        y_pred = get_tfarray(y_pred)
-
-        # accuracy_score(y_test, y_pred, normalize=False)
+        self.metrics['Bal_Acc'] = balanced_accuracy_score(y_test, y_pred)
+        accuracy_score(y_test, y_pred, normalize=False)
 
         self.metrics["Classification Report"] = classification_report(y_test, y_pred, target_names=self.class_names, digits=4)
 
-        cm =confusion_matrix(y_test.argmax(axis=1), y_pred.argmax(axis=1))
+        # cm =confusion_matrix(y_test.argmax(axis=1), y_pred.argmax(axis=1))
         #Now the normalize the diagonal entries
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        # cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-        self.metrics['Confusion_matrix'] = cm.tolist()
+        # self.metrics['Confusion_matrix'] = cm.tolist()
 
         if return_preds:
             return self.metrics, preds
@@ -98,9 +100,11 @@ class General_model:
         self.model.save(location)
         print("Saved model at ", location )
 
-    def load_model(self, location):
+    def l_model(self, location, opt):
         print("Loading model from ", location)
         self.model = load_model(location)
+        # self.model_compile(opt)
+        self.model.compile(metrics = ['accuracy'])
 
 
 class NormalNeuralNetwork(General_model):
@@ -110,16 +114,21 @@ class NormalNeuralNetwork(General_model):
         
         self.model.add(Input(shape = inp_shape))
 
+        # self.model.add(Dense(512, activation = 'relu'))
+        # self.model.add(BatchNormalization())
         self.model.add(Dense(256, activation = 'relu'))
         self.model.add(BatchNormalization())
         self.model.add(Dropout(dropout_size))
         self.model.add(Dense(128, activation = 'relu'))
+        self.model.add(Dropout(dropout_size))
         self.model.add(BatchNormalization())
-        self.model.add(Dense(64, activation = 'relu'))
-        self.model.add(Dense(16, activation = 'relu'))
+        # self.model.add(Dense(128, activation = 'relu'))
+        # self.model.add(BatchNormalization())
+        self.model.add(Dense(32, activation = 'relu'))
+        # self.model.add(BatchNormalization())
 
-        self.model.add(Dense(self.num_classes, activation = 'softmax'))
-
+        # self.model.add(Dense(self.num_classes, activation = 'softmax'))
+        self.model.add(Dense(1, activation = 'sigmoid'))
         print(self.name + " model created")
         print(self.model.summary())        
         self.metrics["Summary"] = str(self.model.summary())

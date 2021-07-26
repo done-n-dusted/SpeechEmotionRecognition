@@ -18,15 +18,17 @@ mname_txt = 'bert-base-uncased'
 SPR = Speech_Recognizer(mname_sp)   
 
 def save_transcripts(source, set_name, class_name, noise_name, db):
-    df = pd.DataFrame(columns = ['Utterance', 'Class'])
+    df = pd.DataFrame(columns = ['Utterance', 'Class', 'ID'])
 
     dir_name = source + set_name + '_' + class_name + '_' + noise_name + '_' + db
 
-    files = [dir_name + '/' + x for x in os.listdir(dir_name)]
+    # files = [dir_name + '/' + x for x in os.listdir(dir_name)]
+    files = os.listdir(dir_name)
     for i in tqdm(range(len(files))):
+        floc = dir_name + '/' + files[i]
         # print(files[i])
         # print(SPR.transcribe(files[i]))
-        df.loc[i] = [SPR.transcribe(files[i]), class_name]
+        df.loc[i] = [SPR.transcribe(floc), class_name, files[i]]
 
     return df
 
@@ -34,7 +36,7 @@ def save_transcripts(source, set_name, class_name, noise_name, db):
 
 source = '../MELD_noise/'
 set_names = ['train', 'test', 'dev']
-noises = ['babble']
+noises = ['airport', 'babble']
 # set_name = 'dev'
 # noise_name = 'airport'
 dbs = ['0dB', '10dB', '20dB']
