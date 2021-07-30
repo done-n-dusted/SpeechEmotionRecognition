@@ -8,12 +8,12 @@ import re
 mname_txt = 'bert-base-uncased'
 TFE = BERT_Text_Feature_Extracter(mname_txt)
 
-transcript_path = 'text_csv/train_sent_emo.csv'
+# transcript_path = 'text_csv/dev_sent_emo.csv'
 
-# transcript_path = 'noise_csv/'
-set = 'train'
-noise = 'clean'
-target = '../../mitacs/MELD_text/'
+transcript_path = 'noise_csv/'
+set = 'dev'
+noise = 'other'
+target = '../../mitacs/MELD_text_aug/'
 
 
 if noise == 'clean':
@@ -34,10 +34,10 @@ else:
 
     for s in ['train', 'test', 'dev']:
         for n in ['airport_0dB', 'airport_10dB', 'airport_20dB', 'babble_0dB', 'babble_10dB', 'babble_20dB']:
-            data_frame = pd.read_csv(transcript_path + s + '_' + n + '.csv')
+            data_frame = pd.read_csv(transcript_path + s + '_' + n + '_aug.csv')
 
             req = np.array(data_frame[['Utterance', 'Class', 'ID']])
-            print('\nPreparing data for ' + s + '_' + n)
+            print('\nPreparing data for ' + s + '_' + n + '_aug')
 
             for u, e, id in tqdm(req):
                 

@@ -29,12 +29,13 @@ def save_transcripts(source, set_name, class_name, noise_name, db):
         # print(files[i])
         # print(SPR.transcribe(files[i]))
         df.loc[i] = [SPR.transcribe(floc), class_name, files[i]]
+        # print(SPR.transcribe(floc), floc)
 
     return df
 
 
 
-source = '../MELD_noise/'
+source = '../../mitacs/MELD_noise_aug/'
 set_names = ['train', 'test', 'dev']
 noises = ['airport', 'babble']
 # set_name = 'dev'
@@ -51,7 +52,7 @@ for set_name in set_names:
             result = anger_df.append(sadness_df, sort = True, ignore_index = True)
 
 
-            name = './noise_csv/' + set_name + '_' + noise_name + '_' + db + '.csv'
+            name = './noise_csv/' + set_name + '_' + noise_name + '_' + db + '_aug.csv'
             print(name, 'Done')
 
             result.to_csv(name)
