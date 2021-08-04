@@ -20,38 +20,38 @@ emotion_key = {
     'sad' : 1
 }
 
-def get_df(gmap_dir, msf_dir, txt_dir, class_name):
-    print('Processing', gmap_dir, msf_dir, txt_dir)
-    gmap_list = [x for x in os.listdir(gmap_dir)]
-    msf_list = [x for x in os.listdir(msf_dir)]
-    common_list = list(set(gmap_list).intersection(msf_list))
+def get_df(txt_dir, class_name):
+    print('Processing', txt_dir)
+    # gmap_list = [x for x in os.listdir(gmap_dir)]
+    # msf_list = [x for x in os.listdir(msf_dir)]
+    # common_list = list(set(gmap_list).intersection(msf_list))
     txt_list = [x for x in os.listdir(txt_dir)]
 
-    common_list = list(set(common_list).intersection(txt_list))
+    # common_list = list(set(common_list).intersection(txt_list))
 
-    gmap = [gmap_dir + x for x in common_list]
-    msf = [msf_dir + x for x in common_list]
-    txt = [txt_dir + x for x in common_list]
+    # gmap = [gmap_dir + x for x in common_list]
+    # msf = [msf_dir + x for x in common_list]
+    txt = [txt_dir + x for x in txt_list]
 
     # print(gmap[0])
-    gmap_len = len(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
+    # gmap_len = len(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     text_len = 768
     # print(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     # print(gmap_len)
     # print('#', gmap_len, text_len)
-    full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
+    full = pd.DataFrame(columns = list(range(text_len)) + ['class'])
     # print(len(full.columns))
     i = 0
 
-    for f in tqdm(common_list):
-        gmap_curr = gmap_dir + f
-        msf_curr = msf_dir + f
-        txt_curr = txt_dir + f
+    for f in tqdm(txt):
+        # gmap_curr = gmap_dir + f
+        # msf_curr = msf_dir + f
+        txt_curr = f
 
-        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
-        gmap_df.drop([0, 1], axis = 1, inplace = True)
+        # gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
+        # gmap_df.drop([0, 1], axis = 1, inplace = True)
         # print('gmap', list(gmap_df.loc[0]))
-        msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
+        # msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
         # print('msf', msf_df)
         txt_df = pd.read_csv(txt_curr)
         # print(txt_df)
@@ -59,25 +59,25 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
 
         # print(msf_df.mean(axis = 0), msf_df.shape)
         # print(len(list(gmap_df.loc[0])), len(list(msf_df)), len(list(txt_df['0'])))
-        full.loc[i] = list(gmap_df.loc[0]) + list(msf_df) + list(txt_df['0']) + [class_name]
+        full.loc[i] = list(txt_df['0']) + [class_name]
         # break
         i += 1
     return full
 
 
-def wrapper(gmap_grand, msf_grand, txt_grand, set_name, aud_noise, txt_noise):
+def wrapper(txt_grand, set_name, txt_noise):
 
-    gmap_anger = gmap_grand + set_name + '_anger_' + aud_noise + '/'
-    msf_anger = msf_grand + set_name + '_anger_' + aud_noise + '/msf/'
+    # gmap_anger = gmap_grand + set_name + '_anger_' + aud_noise + '/'
+    # msf_anger = msf_grand + set_name + '_anger_' + aud_noise + '/msf/'
     txt_anger = txt_grand + set_name + '_anger_' + txt_noise + '/'
     
-    gmap_sad = gmap_grand + set_name + '_sad_' + aud_noise + '/'
-    msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/'
+    # gmap_sad = gmap_grand + set_name + '_sad_' + aud_noise + '/'
+    # msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/'
     txt_sad = txt_grand + set_name + '_sad_' + txt_noise + '/'
     
 
-    df_anger = get_df(gmap_anger, msf_anger, txt_anger, 'anger')
-    df_sad = get_df(gmap_sad, msf_sad, txt_sad, 'sad')
+    df_anger = get_df(txt_anger, 'anger')
+    df_sad = get_df(txt_sad, 'sad')
     
     df_csv = pd.concat([df_anger, df_sad], ignore_index = True)
     
@@ -101,18 +101,18 @@ def splitXY(df):
     return f2(X), y
 
 
-gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
-msf_grand = '../../mitacs/MELD_dataset_MSF/'
+# gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
+# msf_grand = '../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../mitacs/MELD_text/'
 
-txt_noise = 'clean'
+txt_noise = 'babble_10dB'
 # aud_noise = txt_noise
-aud_noise = 'CAFETERIA_15dB'
+# aud_noise = 'clean'
 
-scaler_name = '../models/c_babble_scaler.pkl'
-model_name = '../models/clean_babble.h5'
+scaler_name = '../models/text_scaler.pkl'
+model_name = '../models/text_model.h5'
 
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
+test_csv = wrapper(txt_grand, 'test', txt_noise)
 X_test, y_test = splitXY(test_csv)
 
 scaler = load(open(scaler_name, 'rb'))

@@ -35,12 +35,17 @@ def save_transcripts(source, set_name, class_name, noise_name, db):
 
 
 
-source = '../../mitacs/MELD_noise_aug/'
-set_names = ['train', 'test', 'dev']
-noises = ['airport', 'babble']
+# source = '../../mitacs/MELD_noise_aug/'
+# set_names = ['train', 'test', 'dev']
+# noises = ['airport', 'babble']
+
+source = '../../mitacs/cafeteria/'
+set_names = ['test']
+noises = ['CAFETERIA']
 # set_name = 'dev'
 # noise_name = 'airport'
-dbs = ['0dB', '10dB', '20dB']
+# dbs = ['0dB', '10dB', '20dB']
+dbs = ['0dB', '5dB', '10dB', '15dB', '20dB']
 
 for set_name in set_names:
     for noise_name in noises:
@@ -52,7 +57,7 @@ for set_name in set_names:
             result = anger_df.append(sadness_df, sort = True, ignore_index = True)
 
 
-            name = './noise_csv/' + set_name + '_' + noise_name + '_' + db + '_aug.csv'
+            name = './noise_csv/' + set_name + '_' + noise_name + '_' + db + '.csv'
             print(name, 'Done')
 
             result.to_csv(name)

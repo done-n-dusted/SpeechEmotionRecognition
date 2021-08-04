@@ -8,7 +8,7 @@ from sklearn import preprocessing
 from tqdm import tqdm
 from STFE import Models, DataPreparer
 from tensorflow.keras import optimizers
-from pickle import load
+from pickle import dump
 
 # emotion_key = {
 #     'anger' : [1, 0],
@@ -19,6 +19,7 @@ emotion_key = {
     'anger' : 0,
     'sad' : 1
 }
+
 
 def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     print('Processing', gmap_dir, msf_dir, txt_dir)
@@ -38,7 +39,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     text_len = 768
     # print(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     # print(gmap_len)
-    # print('#', gmap_len, text_len)
+    # print('# 223', gmap_len, text_len)
     full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
     # print(len(full.columns))
     i = 0
@@ -48,7 +49,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
         msf_curr = msf_dir + f
         txt_curr = txt_dir + f
 
-        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
+        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0], index_col = False)
         gmap_df.drop([0, 1], axis = 1, inplace = True)
         # print('gmap', list(gmap_df.loc[0]))
         msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
@@ -99,37 +100,4 @@ def splitXY(df):
     # print(X.shape, y.shape)
     # print(X.dtype, y.dtype)
     return f2(X), y
-
-
-gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
-msf_grand = '../../mitacs/MELD_dataset_MSF/'
-txt_grand = '../../mitacs/MELD_text/'
-
-txt_noise = 'clean'
-# aud_noise = txt_noise
-aud_noise = 'CAFETERIA_15dB'
-
-scaler_name = '../models/c_babble_scaler.pkl'
-model_name = '../models/clean_babble.h5'
-
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
-X_test, y_test = splitXY(test_csv)
-
-scaler = load(open(scaler_name, 'rb'))
-X_test = scaler.transform(X_test)
-
-
-print(np.max(X_test), np.min(X_test))
-print("Done scaling data")
-
-class_names = ['anger', 'sad']
-
-nnn = Models.NormalNeuralNetwork(0.3, class_names, (X_test.shape[1], ))
-sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.95, nesterov=False)
-
-nnn.l_model(model_name, sgd)
-
-nnn_metrics = nnn.get_metrics(X_test, y_test)
-print(nnn_metrics['Bal_Acc'])
-print(nnn_metrics['Classification Report'])
 
