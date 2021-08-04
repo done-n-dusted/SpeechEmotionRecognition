@@ -10,11 +10,6 @@ from STFE import Models, DataPreparer
 from tensorflow.keras import optimizers
 from pickle import load
 
-# emotion_key = {
-#     'anger' : [1, 0],
-#     'sad' : [0, 1]
-# }
-
 emotion_key = {
     'anger' : 0,
     'sad' : 1
@@ -105,12 +100,13 @@ gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
 msf_grand = '../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../mitacs/MELD_text/'
 
-txt_noise = 'clean'
-# aud_noise = txt_noise
-aud_noise = 'CAFETERIA_15dB'
+#TODO keep switching these for required test set
+txt_noise = 'CAFETERIA_15dB'
+aud_noise = txt_noise
+# aud_noise = 'clean'
 
-scaler_name = '../models/c_babble_scaler.pkl'
-model_name = '../models/clean_babble.h5'
+scaler_name = '../models/c_ab_scaler.pkl'
+model_name = '../models/clean_ab.h5'
 
 test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
 X_test, y_test = splitXY(test_csv)

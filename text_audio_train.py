@@ -1,3 +1,8 @@
+
+# Training on non Augmented data only
+
+# Works only on combination of eGEMAPS and MSF features. Can be altered if necessary
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 
@@ -10,10 +15,6 @@ from STFE import Models, DataPreparer
 from tensorflow.keras import optimizers
 from pickle import dump
 
-# emotion_key = {
-#     'anger' : [1, 0],
-#     'sad' : [0, 1]
-# }
 
 emotion_key = {
     'anger' : 0,
@@ -38,7 +39,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     text_len = 768
     # print(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     # print(gmap_len)
-    # print('#', gmap_len, text_len)
+    # print('# 223', gmap_len, text_len)
     full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
     # print(len(full.columns))
     i = 0
@@ -48,7 +49,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
         msf_curr = msf_dir + f
         txt_curr = txt_dir + f
 
-        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
+        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0], index_col = False)
         gmap_df.drop([0, 1], axis = 1, inplace = True)
         # print('gmap', list(gmap_df.loc[0]))
         msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
@@ -72,7 +73,7 @@ def wrapper(gmap_grand, msf_grand, txt_grand, set_name, aud_noise, txt_noise):
     txt_anger = txt_grand + set_name + '_anger_' + txt_noise + '/'
     
     gmap_sad = gmap_grand + set_name + '_sad_' + aud_noise + '/'
-    msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/'
+    msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/' 
     txt_sad = txt_grand + set_name + '_sad_' + txt_noise + '/'
     
 
@@ -101,39 +102,60 @@ def splitXY(df):
     return f2(X), y
 
 
-gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/'
+gmap_grand = '../../mitacs/MELD_noise_eGEMAPS_feat/' 
 msf_grand = '../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../mitacs/MELD_text/'
 
-txt_noise = 'clean'
-# aud_noise = txt_noise
-aud_noise = 'clean'
+noise = 'clean'
+noise2 = ['_0dB', '_10dB', '_20dB']
+
+#noise_types = [] for using only clean data
+noise_types = ['airport', 'babble']
+
+aud_noise = noise
+txt_noise = noise
 
 
 name = 'text_' + txt_noise + '_aud_' + aud_noise + '_training'
 
-train_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', aud_noise, txt_noise)
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
-dev_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'dev', aud_noise, txt_noise)
+# collecting clean data
+train_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', noise, noise)
+test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', noise, noise)
+dev_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'dev', noise, noise)
 
 X_train, y_train = splitXY(train_csv)
 X_test, y_test = splitXY(test_csv)
 X_dev, y_dev = splitXY(dev_csv)
 
+print(X_train.shape)
+
 # print("Saved files")
+
+# loading noisy data for training
+for n in noise2:
+    for noise_type in noise_types:
+        n1 = noise_type + n
+        print('\n', n1, '\n')
+        dset_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', n1, n1)
+        dx_train, dy_train = splitXY(dset_csv)
+        # print(dx_train.shape)
+        X_train = np.concatenate([X_train, dx_train], axis = 0)
+        y_train = np.concatenate([y_train, dy_train], axis = 0) 
+        # print(X_train.shape)
 
 # DP = DataPreparer.ParentDataPrep(X_train, y_train, X_test, y_test, X_dev, y_dev)
 
 scaler = preprocessing.StandardScaler()
 scaler.fit(X_train)
+
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 X_dev = scaler.transform(X_dev)
 
-print(np.max(X_train), np.min(X_train))
-print(np.max(X_dev), np.min(X_dev))
-print(np.max(X_test), np.min(X_test))
-dump(scaler, open('../models/clean_scaler.pkl', 'wb'))
+print("X_train shape", X_train.shape)
+
+# TODO: Change scaler name
+dump(scaler, open('../models/c_ab_scaler.pkl', 'wb'))
 
 print("Done scaling data")
 
@@ -154,5 +176,6 @@ nnn_metrics = nnn.get_metrics(X_test, y_test)
 print(nnn_metrics)
 
 model = nnn.get_model()
-# dump(model, open('../models/clean.pkl', 'wb'))
-model.save('../models/clean.h5', include_optimizer = False)
+
+# TODO change model name
+model.save('../models/clean_ab.h5', include_optimizer = False)
