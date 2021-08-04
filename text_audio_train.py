@@ -143,7 +143,6 @@ for n in noise2:
         y_train = np.concatenate([y_train, dy_train], axis = 0) 
         # print(X_train.shape)
 
-# DP = DataPreparer.ParentDataPrep(X_train, y_train, X_test, y_test, X_dev, y_dev)
 
 scaler = preprocessing.StandardScaler()
 scaler.fit(X_train)

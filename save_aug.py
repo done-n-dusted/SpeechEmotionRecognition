@@ -1,3 +1,5 @@
+# Saves augmented audio files in the tree
+
 import os
 import augly.audio as audaugs
 import augly.utils as utils

@@ -1,3 +1,7 @@
+# Saves all BERT features as a npy file
+
+# Not actually needed
+
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 

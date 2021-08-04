@@ -1,3 +1,7 @@
+# Saves BERT features as individual CSV files in the tree where
+
+
+
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
