@@ -181,4 +181,4 @@ print(nnn_metrics)
 model = nnn.get_model()
 
 # TODO change model name
-model.save('../models/../clean_ab.h5', include_optimizer = False)
+model.save('../../models/clean_ab.h5', include_optimizer = False)

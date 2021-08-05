@@ -1,11 +1,5 @@
-
-# Training on non Augmented data only
-
-# Works only on combination of eGEMAPS and MSF features. Can be altered if necessary
-
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
-
 import sys
 
 sys.path.insert(1, '../')
@@ -17,8 +11,7 @@ from sklearn import preprocessing
 from tqdm import tqdm
 from STFE import Models, DataPreparer
 from tensorflow.keras import optimizers
-from pickle import dump
-
+from pickle import load
 
 emotion_key = {
     'anger' : 0,
@@ -43,7 +36,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     text_len = 768
     # print(pd.read_csv(gmap[0], sep = ';', header = None, skiprows = [0]).columns)
     # print(gmap_len)
-    # print('# 223', gmap_len, text_len)
+    # print('#', gmap_len, text_len)
     full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
     # print(len(full.columns))
     i = 0
@@ -53,7 +46,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
         msf_curr = msf_dir + f
         txt_curr = txt_dir + f
 
-        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0], index_col = False)
+        gmap_df = pd.read_csv(gmap_curr, sep = ';', header = None, skiprows = [0])
         gmap_df.drop([0, 1], axis = 1, inplace = True)
         # print('gmap', list(gmap_df.loc[0]))
         msf_df = pd.read_csv(msf_curr, sep = ',', header = None).mean(axis = 0)
@@ -77,7 +70,7 @@ def wrapper(gmap_grand, msf_grand, txt_grand, set_name, aud_noise, txt_noise):
     txt_anger = txt_grand + set_name + '_anger_' + txt_noise + '/'
     
     gmap_sad = gmap_grand + set_name + '_sad_' + aud_noise + '/'
-    msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/' 
+    msf_sad = msf_grand + set_name + '_sad_' + aud_noise + '/msf/'
     txt_sad = txt_grand + set_name + '_sad_' + txt_noise + '/'
     
 
@@ -106,96 +99,36 @@ def splitXY(df):
     return f2(X), y
 
 
-gmap_grand = '../../../mitacs/MELD_noise_eGEMAPS_feat/' 
+gmap_grand = '../../../mitacs/MELD_noise_eGEMAPS_feat/'
 msf_grand = '../../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../../mitacs/MELD_text/'
 
-noise = 'clean'
-noise2 = ['_0dB', '_10dB', '_20dB']
+#TODO keep switching these for required test set
+txt_noise = 'clean'
+# aud_noise = txt_noise
+aud_noise = 'CAFETERIA_15dB'
 
-#noise_types = [] for using only clean data
-noise_types = ['airport', 'babble']
+scaler_name = '../../models/aug_c_ab_scaler.pkl'
+model_name = '../../models/aug_clean_ab.h5'
 
-aud_noise = noise
-txt_noise = noise
-
-
-name = 'text_' + txt_noise + '_aud_' + aud_noise + '_training'
-
-# collecting clean data
-train_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', noise, noise)
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', noise, noise)
-dev_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'dev', noise, noise)
-
-X_train, y_train = splitXY(train_csv)
+test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
 X_test, y_test = splitXY(test_csv)
-X_dev, y_dev = splitXY(dev_csv)
 
-print(X_train.shape)
-
-# print("Saved files")
-
-# loading noisy data for training
-for n in noise2:
-    for noise_type in noise_types:
-        n1 = noise_type + n
-        print('\n', n1, '\n')
-        dset_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', n1, n1)
-        dx_train, dy_train = splitXY(dset_csv)
-        # print(dx_train.shape)
-        X_train = np.concatenate([X_train, dx_train], axis = 0)
-        y_train = np.concatenate([y_train, dy_train], axis = 0) 
-        # print(X_train.shape)
-
-gmap_grand_aug = '../../../mitacs/MELD_noise_aug_eGEMAPS_feat/' 
-msf_grand_aug = '../../../mitacs/MELD_noise_aug_MSF_final/'
-txt_grand_aug = '../../../mitacs/MELD_text_aug/'
-
-print("\nLoading augmented data\n")
-for n in noise2:
-    for noise_type in noise_types:
-        n1 = noise_type + n
-        print('\n', n1, '\n')
-        dset_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'train', n1, n1)
-        dx_train, dy_train = splitXY(dset_csv)
-        # print(dx_train.shape)
-        X_train = np.concatenate([X_train, dx_train], axis = 0)
-        y_train = np.concatenate([y_train, dy_train], axis = 0) 
-        # print(X_train.shape)
-
-
-
-scaler = preprocessing.StandardScaler()
-scaler.fit(X_train)
-
-X_train = scaler.transform(X_train)
+scaler = load(open(scaler_name, 'rb'))
 X_test = scaler.transform(X_test)
-X_dev = scaler.transform(X_dev)
 
-print("X_train shape", X_train.shape)
 
-# TODO: Change scaler name
-dump(scaler, open('../../models/aug_c_ab_scaler.pkl', 'wb'))
-
+print(np.max(X_test), np.min(X_test))
 print("Done scaling data")
 
 class_names = ['anger', 'sad']
-cws = [1, 1.8]
-class_weights = {}
-for i in range(len(class_names)):
-    class_weights[i] = cws[i]
 
+nnn = Models.NormalNeuralNetwork(0.3, class_names, (X_test.shape[1], ))
 sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.95, nesterov=False)
 
-nnn = Models.NormalNeuralNetwork(0.5, class_names, (X_train.shape[1], ))
-nnn.model_compile(sgd)
-
-nnn.model_fit(class_weights, 850, X_train, y_train, X_dev, y_dev, fig_name = name)
+nnn.l_model(model_name, sgd)
 
 nnn_metrics = nnn.get_metrics(X_test, y_test)
-print(nnn_metrics)
+print(nnn_metrics['Bal_Acc'])
+print(nnn_metrics['Classification Report'])
 
-model = nnn.get_model()
-
-# TODO change model name
-model.save('../../models/aug_clean_ab.h5', include_optimizer = False)

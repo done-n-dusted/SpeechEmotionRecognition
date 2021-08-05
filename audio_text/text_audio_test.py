@@ -108,8 +108,8 @@ txt_noise = 'CAFETERIA_15dB'
 aud_noise = txt_noise
 # aud_noise = 'clean'
 
-scaler_name = '../models/../c_ab_scaler.pkl'
-model_name = '../models/../clean_ab.h5'
+scaler_name = '../../models/c_ab_scaler.pkl'
+model_name = '../../models/clean_ab.h5'
 
 test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
 X_test, y_test = splitXY(test_csv)
