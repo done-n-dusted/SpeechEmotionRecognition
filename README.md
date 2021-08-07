@@ -9,7 +9,7 @@ Determine the importance of speech and text features for the task of emotion rec
 3. Extract audio features like MSF and eGEMAPS from the audio files.
 4. Use the features to generate emotion.
 
-Note: Only two emotions, anger and sadness, were considered for the experiments. These emotions represent their corresponding arousal levels.
+Note: Only two emotions, anger and sadness, were considered for the experiments. These emotions represent their corresponding arousal levels. 
 
 ## Libraries required
 ```
@@ -26,7 +26,7 @@ tqdm==4.61.1
 
 ## Directory Structure
 
-For more details, follow the README.md files in the corresponding directories.
+For more details, follow the README.md files in the corresponding directories. (_comming soon_)
 
 
 * STFE : Contains some important object definitions that are necessary for all the computations and experiments for this project.
