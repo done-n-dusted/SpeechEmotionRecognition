@@ -14,12 +14,12 @@ import re
 mname_txt = 'bert-base-uncased'
 TFE = BERT_Text_Feature_Extracter(mname_txt)
 
-# transcript_path = 'text_csv/dev_sent_emo.csv'
+transcript_path = '../text_csv/dev_sent_emo.csv'
 
-transcript_path = 'noise_csv/'
-set = 'test'
-noise = 'CAFETERIA'
-target = '../../../mitacs/cafeteria_text/'
+# transcript_path = '../noise_csv/'
+set = 'dev'
+noise = 'clean'
+target = '../../../mitacs/MELD_clean_aug_text/'
 
 
 if noise == 'clean':

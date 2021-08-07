@@ -54,18 +54,18 @@ class BERT_Text_Feature_Extracter:
 
 
 class Speech_To_Text_Features:
-    def __init__(self, mname_asr, text_feature = 'BERT', mname_txt = None):
+    def __init__(self, mname_asr, mname_txt = None):
         #text_feature = BERT, TCNN
 
         self.SR = Speech_Recognizer(mname_asr)
-        if text_feature == 'BERT':
-            self.TFE = BERT_Text_Feature_Extracter(mname_txt)
-        elif text_feature == 'TCNN':
-            self.TFE = TCNN_Text_Feature_Extracter()
+        # if text_feature == 'BERT':
+        self.TFE = BERT_Text_Feature_Extracter(mname_txt)
+        # elif text_feature == 'TCNN':
+            # self.TFE = TCNN_Text_Feature_Extracter()
 
     def get_text_features(self, audio_file_name):
-        transcription = SR.transcribe(audio_file_name)
-        txt_features = TFE.features_fromtext(transcription)
+        transcription = self.SR.transcribe(audio_file_name)
+        txt_features = self.TFE.features_fromtext(transcription)
         return txt_features
 
     

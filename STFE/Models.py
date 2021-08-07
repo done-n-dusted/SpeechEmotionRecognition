@@ -83,7 +83,7 @@ class General_model:
         self.metrics['Bal_Acc'] = balanced_accuracy_score(y_test, y_pred)
         accuracy_score(y_test, y_pred, normalize=False)
 
-        self.metrics["Classification Report"] = classification_report(y_test, y_pred, target_names=self.class_names, digits=4)
+        self.metrics["Classification Report"] = classification_report(y_test, y_pred, target_names=self.class_names, digits=4, output_dict = True)
 
         # cm =confusion_matrix(y_test.argmax(axis=1), y_pred.argmax(axis=1))
         #Now the normalize the diagonal entries
