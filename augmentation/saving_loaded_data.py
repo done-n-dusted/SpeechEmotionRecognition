@@ -37,7 +37,8 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
     text_len = 768
     full = pd.DataFrame(columns = list(range(223 + gmap_len + text_len - 2)) + ['class'])
     i = 0
-
+    # print(len(common_list))
+    
     for f in tqdm(common_list):
         gmap_curr = gmap_dir + f
         msf_curr = msf_dir + f
@@ -50,6 +51,7 @@ def get_df(gmap_dir, msf_dir, txt_dir, class_name):
 
         full.loc[i] = list(gmap_df.loc[0]) + list(msf_df) + list(txt_df['0']) + [class_name]
         i += 1
+    
     return full
 
 
@@ -109,7 +111,7 @@ X_dev, y_dev = splitXY(dev_csv)
 
 # print(X_train.shape)
 
-print("Loaded Augmented data")
+print("Loading Augmented data")
 
 for n in noise_list:
     print('\n', n, '\n')
