@@ -104,31 +104,67 @@ msf_grand = '../../../mitacs/MELD_dataset_MSF/'
 txt_grand = '../../../mitacs/MELD_text/'
 
 #TODO keep switching these for required test set
-txt_noise = 'clean'
+# txt_noise = 'clean'
 # aud_noise = txt_noise
-aud_noise = 'CAFETERIA_15dB'
+# aud_noise = 'CAFETERIA_15dB'
 
-scaler_name = '../../models/aug_c_ab_scaler.pkl'
-model_name = '../../models/aug_clean_ab.h5'
+noise_list = [
+    ['clean', 'clean'],
+    ['clean', 'CAFETERIA_0dB'],
+    ['clean', 'CAFETERIA_5dB'],
+    ['clean', 'CAFETERIA_10dB'],
+    ['clean', 'CAFETERIA_15dB'],
+    ['clean', 'CAFETERIA_20dB'],
+    ['CAFETERIA_0dB', 'clean'],
+    ['CAFETERIA_5dB', 'clean'],
+    ['CAFETERIA_10dB', 'clean'],
+    ['CAFETERIA_15dB', 'clean'],
+    ['CAFETERIA_20dB', 'clean'],
+    ['CAFETERIA_0dB', 'CAFETERIA_0dB'],
+    ['CAFETERIA_5dB', 'CAFETERIA_5dB'],
+    ['CAFETERIA_10dB', 'CAFETERIA_10dB'],
+    ['CAFETERIA_15dB', 'CAFETERIA_15dB'],
+    ['CAFETERIA_20dB', 'CAFETERIA_20dB']
+]
 
-test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
-X_test, y_test = splitXY(test_csv)
 
-scaler = load(open(scaler_name, 'rb'))
-X_test = scaler.transform(X_test)
+scaler_name = '../../models/clean_aug_scaler.pkl'
+model_name = '../../models/clean_aug14.h5'
+
+res = ['text audio anger sad F1 precision recall bal_acc\n']
+
+for txt_noise, aud_noise in tqdm(noise_list):
+    test_csv = wrapper(gmap_grand, msf_grand, txt_grand, 'test', aud_noise, txt_noise)
+    X_test, y_test = splitXY(test_csv)
+
+    scaler = load(open(scaler_name, 'rb'))
+    X_test = scaler.transform(X_test)
 
 
-print(np.max(X_test), np.min(X_test))
-print("Done scaling data")
+    print(np.max(X_test), np.min(X_test))
+    print("Done scaling data")
 
-class_names = ['anger', 'sad']
+    class_names = ['anger', 'sad']
 
-nnn = Models.NormalNeuralNetwork(0.3, class_names, (X_test.shape[1], ))
-sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.95, nesterov=False)
+    nnn = Models.NormalNeuralNetwork(0.3, class_names, (X_test.shape[1], ))
+    sgd = optimizers.SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=False)
 
-nnn.l_model(model_name, sgd)
+    # sgd = optimizers.SGD(lr=1e-4, decay=1e-6, momentum=0.95, nesterov=False)
 
-nnn_metrics = nnn.get_metrics(X_test, y_test)
-print(nnn_metrics['Bal_Acc'])
-print(nnn_metrics['Classification Report'])
+    nnn.l_model(model_name, sgd)
 
+    nnn_metrics = nnn.get_metrics(X_test, y_test)
+    print(nnn_metrics['Bal_Acc'])
+    print(nnn_metrics['Classification Report'])
+    dic = nnn_metrics['Classification Report']
+
+    s = txt_noise + ' ' + aud_noise + ' ' + str(dic['anger']['f1-score']) + ' '
+    s += str(dic['sad']['f1-score']) + ' ' + str(dic['weighted avg']['f1-score']) + ' '
+    s += str(dic['weighted avg']['precision']) + ' ' + str(dic['weighted avg']['recall']) + ' '
+    s += str(nnn_metrics['Bal_Acc']) + '\n'
+    print(s)
+    res.append(s)
+
+f = open("../aug_results/results14.txt", "w")
+f.writelines(res)
+f.close()
